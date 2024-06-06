@@ -4,14 +4,17 @@ from ..article_candidate import ArticleCandidate
 
 
 class AbstractExtractor:
-    """Abstract class for article extractors.
-    """
+    """Abstract class for article extractors."""
 
     __metaclass__ = ABCMeta
 
     @abstractmethod
     def __init__(self):
         self.name = None
+
+    def _markdown(self, item) -> None | str:
+        """Returns the markdown of the extracted article."""
+        return None
 
     def _name(self):
         """Returns the name of the article extractor."""
@@ -62,5 +65,6 @@ class AbstractExtractor:
         article_candidate.author = self._author(item)
         article_candidate.publish_date = self._publish_date(item)
         article_candidate.language = self._language(item)
+        article_candidate.markdown = self._markdown(item)
 
         return article_candidate

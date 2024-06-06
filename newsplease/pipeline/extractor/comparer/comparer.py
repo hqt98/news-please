@@ -1,3 +1,4 @@
+from newsplease.pipeline.extractor.comparer.comparer_markdown import ComparerMarkdown
 from .comparer_Language import ComparerLanguage
 from .comparer_author import ComparerAuthor
 from .comparer_date import ComparerDate
@@ -20,6 +21,7 @@ class Comparer:
         self.comparer_author = ComparerAuthor()
         self.comparer_date = ComparerDate()
         self.comparer_language = ComparerLanguage()
+        self.comparer_markdown = ComparerMarkdown()
 
     def compare(self, item, article_candidates):
         """Compares the article candidates using the different submodules and saves the best results in
@@ -39,4 +41,5 @@ class Comparer:
         result.author = self.comparer_author.extract(item, article_candidates)
         result.publish_date = self.comparer_date.extract(item, article_candidates)
         result.language = self.comparer_language.extract(item, article_candidates)
+        result.markdown = self.comparer_markdown.extract(item, article_candidates)
         return result

@@ -4,11 +4,13 @@ import os
 import sys
 import urllib
 
+from bs4 import BeautifulSoup
 from bs4.dammit import EncodingDetector
 from six.moves import urllib
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
+from newsplease.NewsArticle import NewsArticle
 from newsplease.pipeline.extractor import article_extractor
 from newsplease.crawler.items import NewscrawlerItem
 from dotmap import DotMap
@@ -81,7 +83,12 @@ class NewsPlease:
                 if fetch_images
                 else [("newspaper_extractor_no_images", "NewspaperExtractorNoImages")]
             )
-            + ["readability_extractor", "date_extractor", "lang_detect_extractor"]
+            + [
+                "readability_extractor",
+                "date_extractor",
+                "lang_detect_extractor",
+                "markdown_extractor",
+            ]
         )
 
         title_encoded = "".encode()
@@ -111,7 +118,7 @@ class NewsPlease:
         return final_article
 
     @staticmethod
-    def from_url(url, timeout=None, user_agent=None):
+    def from_url(url, timeout=None, user_agent=None) -> NewsArticle | None:
         """
         Crawls the article from the url and extracts relevant information.
         :param url:
@@ -126,7 +133,9 @@ class NewsPlease:
             return None
 
     @staticmethod
-    def from_urls(urls, timeout=None, user_agent=None):
+    def from_urls(
+        urls, timeout=None, user_agent: str | None = None
+    ) -> dict[str, NewsArticle]:
         """
         Crawls articles from the urls and extracts relevant information.
         :param urls:
@@ -145,7 +154,9 @@ class NewsPlease:
             html = SimpleCrawler.fetch_url(url, timeout=timeout, user_agent=user_agent)
             results[url] = NewsPlease.from_html(html, url, download_date)
         else:
-            results = SimpleCrawler.fetch_urls(urls, timeout=timeout, user_agent=user_agent)
+            results = SimpleCrawler.fetch_urls(
+                urls, timeout=timeout, user_agent=user_agent
+            )
 
             futures = {}
             with cf.ProcessPoolExecutor() as exec:
